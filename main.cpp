@@ -8,8 +8,6 @@
 		it can contain * and it means anything
 	-c is command to delete after they are moved to special folder
 	-f is a name of new folder
-	-u unite folder tree into the one folder
-	-h is help
 */
 #include<filesystem>
 #include<utility>
@@ -31,7 +29,6 @@ int main(int argc, char** argv)
 	string predicat;
 
 	bool clear = false;
-	bool unite = false;
 	
 	for (int i = 1; i < argc; ++i)
 	{
@@ -41,7 +38,6 @@ int main(int argc, char** argv)
 		case 'w':destination = arg.second;   break;
 		case 'c':clear       = true;         break;
 		case 'f':new_folder  = arg.second;   break;
-		case 'u':unite       = true;         break;
 		case 'p':predicat    = arg.second;   break;
 		}
 	}
@@ -52,10 +48,11 @@ int main(int argc, char** argv)
 	if (predicat.empty())
 		kill_app("no predicat!");
 
-
 	filesystem::path directory_to_use = filesystem::path(destination);
 	filesystem::path new_directory = filesystem::path(new_folder);
-	new_directory = directory_to_use / new_directory;
+
+	if(new_directory.is_relative())
+		new_directory = directory_to_use / new_directory;
 
 	filesystem::create_directory(new_directory);
 	if (!filesystem::exists(directory_to_use))
@@ -67,14 +64,25 @@ int main(int argc, char** argv)
 		{
 			try
 			{
-				if(does_match_with_predicat(predicat,f.path().string()))
+				bool matched = does_match_with_predicat(predicat, f.path().string());
+				bool can_be_copied = matched && f.is_regular_file();
+				if(can_be_copied)
 					copy(f,directory_to_use/new_directory,filesystem::copy_options::overwrite_existing);
+				if (clear && can_be_copied)
+					try
+					{
+						filesystem::remove(f);
+					}
+					catch (filesystem::filesystem_error& e)
+					{
+						cout << "can not remove file! " << e.what() << endl;
+					}
 			}
 			catch (filesystem::filesystem_error& e)
 			{
 				cout << "can not copy file! " << e.what() << endl;
 			}
-			if (clear)filesystem::remove(f);
+			
 		}
 	}
 
@@ -82,11 +90,12 @@ int main(int argc, char** argv)
 }
 pair<char, string> parse_argument(string arg)
 {
-	string  keys= "-w-p-c-f-u-h";
-	if (arg.size() < 4) kill_app("argument is too short!");
+	if (arg.size() < 4 && arg != "-c") kill_app("argument is too short!");
+
+	string  keys = "-w-p-c-f";
 	if (keys.find(arg.substr(0, 2)) == string::npos)
 		kill_app("no such key:" + arg.substr(0, 2));
-	if (arg.find('=') == string::npos && arg[1] != 'h')
+	if (arg.find('=') == string::npos && arg != "-c")
 		kill_app("incorrect argument:" + arg);
 
 	char key = arg[1];
