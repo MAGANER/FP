@@ -9,11 +9,22 @@
 	-c is command to delete after they are moved to special folder
 	-f is a name of new folder
 */
-#include"Copy.h"
+#include"WhatToinclude.h"
+#include"Common.h"
 
+#if COPY == 1
+#include"Copy.h"
 using namespace Copy;
+#define INCLUDE_COUNTER (INCLUDE_COUNTER + 1)
+#endif
+
 int main(int argc, char** argv)
 {
+	#if INCLUDE_COUNTER == 0
+	cout << "can not run programm, cos it's compiled of no module!";
+	exit(-1);
+	#endif 
+
 	setlocale(LC_ALL, "rus");
 
 	string destination;
@@ -24,7 +35,7 @@ int main(int argc, char** argv)
 	
 	for (int i = 1; i < argc; ++i)
 	{
-		auto arg = parse_argument(string(argv[i]));
+		auto arg = Common::parse_argument(string(argv[i]));
 		switch (arg.first)
 		{
 		case 'w':destination = arg.second;   break;
@@ -34,13 +45,15 @@ int main(int argc, char** argv)
 		}
 	}
 	if (destination.empty())
-		kill_app("no folder, where to go!");
+		Common::kill_app("no folder, where to go!");
 	if (new_folder.empty())
-		kill_app("no folder to move files!");
+		Common::kill_app("no folder to move files!");
 	if (predicat.empty())
-		kill_app("no predicat!");
+		Common::kill_app("no predicat!");
 
+	#if COPY == 1
 	Copy::copy(destination, new_folder, predicat, clear);
+	#endif
 
 	return 0;
 }
