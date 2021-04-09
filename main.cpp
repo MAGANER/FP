@@ -11,6 +11,7 @@
 */
 #include"WhatToinclude.h"
 #include"Common.h"
+#include"GlobalArgProcessor.h"
 
 #if COPY == 1
 #include"Copy.h"
@@ -18,24 +19,41 @@ using namespace Copy;
 #define INCLUDE_COUNTER (INCLUDE_COUNTER + 1)
 #endif
 
+vector<string> erase_global_arguments(int  argc, char** argv);
 int main(int argc, char** argv)
 {
-	#if INCLUDE_COUNTER == 0
+#if INCLUDE_COUNTER == 0
 	cout << "can not run programm, cos it's compiled of no module!";
 	exit(-1);
-	#endif 
+#endif 
 
 	setlocale(LC_ALL, "rus");
+	if (argc == 1)
+	{
+		cout << "not enough arguments!";
+		exit(-1);
+	}
+	
+
+	GlobArgProc::Type operation_type = GlobArgProc::Type::Undefined;
+	if (GlobArgProc::is_correct(argc, argv))
+		operation_type = GlobArgProc::get_arg_type(argv[1]);
+	else
+	{
+		cout << "such global argument: " << argv[1] << " doesn't exist!";
+		exit(-1);
+	}
+
 
 	string destination;
 	string new_folder;
 	string predicat;
-
 	bool clear = false;
 	
-	for (int i = 1; i < argc; ++i)
+	vector<string> arguments = erase_global_arguments(argc, argv);
+	for (auto& _arg:arguments)
 	{
-		auto arg = Common::parse_argument(string(argv[i]));
+		auto arg = Common::parse_argument(_arg);
 		switch (arg.first)
 		{
 		case 'w':destination = arg.second;   break;
@@ -44,6 +62,7 @@ int main(int argc, char** argv)
 		case 'p':predicat    = arg.second;   break;
 		}
 	}
+
 	if (destination.empty())
 		Common::kill_app("no folder, where to go!");
 	if (new_folder.empty())
@@ -51,9 +70,21 @@ int main(int argc, char** argv)
 	if (predicat.empty())
 		Common::kill_app("no predicat!");
 
-	#if COPY == 1
-	Copy::copy(destination, new_folder, predicat, clear);
-	#endif
+#if COPY == 1
+	if(operation_type == GlobArgProc::Type::Copy)
+		Copy::copy(destination, new_folder, predicat, clear);
+#endif
 
 	return 0;
+}
+vector<string> erase_global_arguments(int  argc, char** argv)
+{
+	vector<string> arguments;
+
+	for (int i = 2; i < argc - 1; ++i) arguments.push_back(string(argv[i]));
+
+	auto last_one = string(argv[argc - 1]);
+	arguments.push_back(Common::get_substr(last_one, 0, last_one.size() - 1));
+
+	return arguments;
 }
