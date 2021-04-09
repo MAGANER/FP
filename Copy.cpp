@@ -1,9 +1,8 @@
 #include"Copy.h"
-
-void Copy::copy(const string& destination,
-				const string& new_folder,
-				const string& predicat,
-				bool clear)
+void Copy::inner::copy(const string& destination,
+					   const string& new_folder,
+					   const string& predicat,
+					   bool clear)
 {
 	filesystem::path directory_to_use = filesystem::path(destination);
 	filesystem::path new_directory = filesystem::path(new_folder);
@@ -42,4 +41,39 @@ void Copy::copy(const string& destination,
 
 		}
 	}
+}
+void Copy::run(const vector<string>& arguments)
+{
+	using namespace Copy::inner;
+
+	string destination;
+	string new_folder;
+	string predicat;
+	bool clear = false;
+
+	map<char, string> options = Common::parse_arguments(arguments,
+														keys,
+														KEYS_SIZE,
+														special_keys,
+														SPEC_KEY_SIZE);
+	for (auto& option : options)
+	{
+		switch (option.first)
+		{
+		case 'w':destination = option.second;   break;
+		case 'c':clear = true;			break;
+		case 'f':new_folder = option.second;   break;
+		case 'p':predicat = option.second;   break;
+		}
+	}
+	if (destination.empty())
+		Common::kill_app("no folder, where to go!");
+	if (new_folder.empty())
+		Common::kill_app("no folder to move files!");
+	if (predicat.empty())
+		Common::kill_app("no predicat!");
+
+
+
+	copy(destination, new_folder, predicat, clear);
 }

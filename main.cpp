@@ -44,35 +44,11 @@ int main(int argc, char** argv)
 		exit(-1);
 	}
 
-
-	string destination;
-	string new_folder;
-	string predicat;
-	bool clear = false;
 	
 	vector<string> arguments = erase_global_arguments(argc, argv);
-	for (auto& _arg:arguments)
-	{
-		auto arg = Common::parse_argument(_arg);
-		switch (arg.first)
-		{
-		case 'w':destination = arg.second;   break;
-		case 'c':clear       = true;         break;
-		case 'f':new_folder  = arg.second;   break;
-		case 'p':predicat    = arg.second;   break;
-		}
-	}
-
-	if (destination.empty())
-		Common::kill_app("no folder, where to go!");
-	if (new_folder.empty())
-		Common::kill_app("no folder to move files!");
-	if (predicat.empty())
-		Common::kill_app("no predicat!");
 
 #if COPY == 1
-	if(operation_type == GlobArgProc::Type::Copy)
-		Copy::copy(destination, new_folder, predicat, clear);
+	if (operation_type == GlobArgProc::Type::Copy) Copy::run(arguments);
 #endif
 
 	return 0;
