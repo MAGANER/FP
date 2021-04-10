@@ -13,6 +13,7 @@ namespace GlobalArgProcessor
 	enum class Type
 	{
 		Copy,
+		Find,
 		Undefined
 	};
 	bool is_correct(int argc, char** argv);

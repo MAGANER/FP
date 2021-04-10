@@ -9,3 +9,4 @@
 #define INCLUDE_COUNTER 0 //don't change it! it counts number of included modules
 
 #define COPY 1
+#define FIND 1

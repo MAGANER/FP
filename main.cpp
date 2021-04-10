@@ -16,7 +16,12 @@
 #if COPY == 1
 #include"Copy.h"
 using namespace Copy;
-#define INCLUDE_COUNTER (INCLUDE_COUNTER + 1)
+#define INCLUDE_COUNTER 1
+#endif
+#if FIND == 1
+#include"Find.h"
+using namespace Find;
+#define INCLUDE_COUNTER 1
 #endif
 
 vector<string> erase_global_arguments(int  argc, char** argv);
@@ -49,6 +54,9 @@ int main(int argc, char** argv)
 
 #if COPY == 1
 	if (operation_type == GlobArgProc::Type::Copy) Copy::run(arguments);
+#endif
+#if FIND == 1
+	if (operation_type == GlobArgProc::Type::Find) Find::run(arguments);
 #endif
 
 	return 0;

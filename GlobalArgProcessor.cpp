@@ -2,8 +2,8 @@
 
 bool GlobalArgProcessor::is_correct(int argc,char** argv)
 {
-	const int ARGS_NUMBER = 1;
-	const char* args[1] = { "C[\0" };
+	const int ARGS_NUMBER = 2;
+	const char* args[ARGS_NUMBER] = { "C[\0","F[\0" };
 
 	char* first= argv[1];
 	char* last = argv[argc - 1];
@@ -20,5 +20,6 @@ bool GlobalArgProcessor::is_correct(int argc,char** argv)
 GlobalArgProcessor::Type GlobalArgProcessor::get_arg_type(char* first_argument)
 {
 	if (strcmp(first_argument, "C[\0") == 0) return GlobalArgProcessor::Type::Copy;
+	if (strcmp(first_argument, "F[\0") == 0) return GlobalArgProcessor::Type::Find;
 	else return GlobalArgProcessor::Type::Undefined;
 }
