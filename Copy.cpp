@@ -14,7 +14,7 @@ void Copy::inner::copy(const string& destination,
 	if (!filesystem::exists(directory_to_use))
 		kill_app("directory " + destination + " doesn't exist!");
 
-	for (auto& f : filesystem::directory_iterator(directory_to_use))
+	for (auto& f : filesystem::recursive_directory_iterator(directory_to_use))
 	{
 		if (f.path() != new_directory)
 		{
