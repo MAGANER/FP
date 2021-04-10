@@ -9,7 +9,7 @@ using namespace std;
 namespace Common
 {
 	void kill_app(string err);
-	bool does_match_with_predicat(string predicat, string value);
+	bool does_match_with_predicat(const string& predicat, const string& value);
 	string get_substr(string str, int begin, int end);
 
 	map<char, string> parse_arguments(const vector<string>& args, 
@@ -24,5 +24,7 @@ namespace Common
 										  int keys_size,
 										  const string* special_keys,
 										  int spec_keys_size);
+		
+		bool match(const string& predicat, const string& value);
 	};
 };

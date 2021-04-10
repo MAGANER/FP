@@ -47,7 +47,21 @@ void Common::kill_app(string err)
 	cout << err;
 	exit(-1);
 }
-bool Common::does_match_with_predicat(string predicat, string value)
+bool Common::inner::match(const string& predicat, const string& value)
+{
+	string::size_type star_point = predicat.find('*');
+
+	//match left and right parts of predicat
+	string left  = get_substr(predicat, 0, star_point);
+	string right = get_substr(predicat, star_point + 1, predicat.size());
+	string left_to_check = get_substr(value, 0, left.size());
+	string right_to_check = get_substr(value, value.size() - right.size(), value.size());
+	bool left_eq = left == left_to_check;
+	bool right_eq = right == right_to_check;
+	return left_eq && right_eq;
+	
+}
+bool Common::does_match_with_predicat(const string& predicat, const string& value)
 {
 	if (predicat == "*") return true;
 	else if (predicat.find('*') == string::npos)
@@ -56,27 +70,12 @@ bool Common::does_match_with_predicat(string predicat, string value)
 	}
 	else
 	{
-		auto match = [](string predicat, string value)
-		{
-			string::size_type star_point = predicat.find('*');
-
-			//match left and right parts of predicat
-			string left = get_substr(predicat, 0, star_point);
-			string right = get_substr(predicat, star_point + 1, predicat.size());
-
-			string left_to_check = get_substr(value, 0, left.size());
-			string right_to_check(value, value.size() - right.size(), value.size());
-			bool left_eq = left == left_to_check;
-			bool right_eq = right == right_to_check;
-			return left_eq && right_eq;
-		};
-
 		if (predicat.find('.') == string::npos && value.find('.') == string::npos)
 		{
 			int star_number = count(predicat.begin(), predicat.end(), '*');
 			if (star_number > 1)kill_app("incorrect predicat!");
-
-			return match(predicat, value);
+			
+			return Common::inner::match(predicat, value);
 		}
 		else if (predicat.find('.') != string::npos && value.find('.') != string::npos)
 		{
@@ -84,17 +83,16 @@ bool Common::does_match_with_predicat(string predicat, string value)
 			if (star_number > 2)kill_app("incorrect predicat!");
 
 			int point_position = predicat.find('.');
-			string left_pred = get_substr(predicat, 0, point_position);
-			string right_pred = get_substr(predicat, point_position + 1, predicat.size());
+			string left_pred = get_substr(predicat, 0, point_position+1);
+			string right_pred = get_substr(predicat, point_position, predicat.size());
 
 			int val_point_pos = value.find('.');
-			string left_val = get_substr(value, 0, val_point_pos);
-			string right_val = get_substr(value, val_point_pos + 1, value.size());
-
-			return match(left_pred, left_val) && match(right_pred, right_val);
+			string left_val = get_substr(value, 0, val_point_pos+1);
+			string right_val = get_substr(value, val_point_pos, value.size());
+			return Common::inner::match(left_pred, left_val) && Common::inner::match(right_pred, right_val);
 		}
-		else cout << "predicat and value should have the same number of points `.`!" << endl
-			<< value + " won't be processed!" << endl;
+		//else cout << "predicat and value should have the same number of points `.`!" << endl
+		//	<< value + " won't be processed!" << endl;
 	}
 
 	return false;
