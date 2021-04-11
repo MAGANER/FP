@@ -1,4 +1,6 @@
 # FP
+```C++ 17```<br>
+
 This utility is used to find/copy files related to specific predicat, passed as CL argument.<br>
 Also you can exlude all thing you don't need in ```WhatToInclude.h```<br>
 Let's see, how to do that:<br>
