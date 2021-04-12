@@ -5,12 +5,15 @@ void Copy::inner::copy(const string& destination,
 					   bool clear)
 {
 	filesystem::path directory_to_use = filesystem::path(destination);
-	filesystem::path new_directory = filesystem::path(new_folder);
+	filesystem::path new_directory    = filesystem::path(new_folder);
 
 	if (new_directory.is_relative())
+	{
 		new_directory = directory_to_use / new_directory;
+		filesystem::create_directory(new_directory);
+	}
 
-	filesystem::create_directory(new_directory);
+	
 	if (!filesystem::exists(directory_to_use))
 		kill_app("directory " + destination + " doesn't exist!");
 
@@ -23,7 +26,7 @@ void Copy::inner::copy(const string& destination,
 				bool matched = does_match_with_predicat(predicat, f.path().string());
 				bool can_be_copied = matched && f.is_regular_file();
 				if (can_be_copied)
-					copy(f, directory_to_use / new_directory, filesystem::copy_options::overwrite_existing);
+					copy(f, new_directory, filesystem::copy_options::overwrite_existing);
 				if (clear && can_be_copied)
 					try
 				{
