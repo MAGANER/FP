@@ -2,7 +2,8 @@
 void Copy::inner::copy(const string& destination,
 					   const string& new_folder,
 					   const string& predicat,
-					   bool clear)
+					   bool clear,
+					   bool recursivly)
 {
 	filesystem::path directory_to_use = filesystem::path(destination);
 	filesystem::path new_directory    = filesystem::path(new_folder);
@@ -17,7 +18,7 @@ void Copy::inner::copy(const string& destination,
 	if (!filesystem::exists(directory_to_use))
 		kill_app("directory " + destination + " doesn't exist!");
 
-	for (auto& f : filesystem::recursive_directory_iterator(directory_to_use))
+	auto process = [&](const filesystem::directory_entry& f)
 	{
 		if (f.path() != new_directory)
 		{
@@ -43,7 +44,15 @@ void Copy::inner::copy(const string& destination,
 			}
 
 		}
-	}
+	};
+
+
+	if (recursivly)
+		for (auto& f : filesystem::recursive_directory_iterator(directory_to_use))
+			process(f);
+	else
+		for (auto& f : filesystem::directory_iterator(directory_to_use))
+			process(f);
 }
 void Copy::run(const vector<string>& arguments)
 {
@@ -53,6 +62,7 @@ void Copy::run(const vector<string>& arguments)
 	string new_folder;
 	string predicat;
 	bool clear = false;
+	bool recursivly = false;
 
 	map<char, string> options = Common::parse_arguments(arguments,
 														keys,
@@ -67,6 +77,7 @@ void Copy::run(const vector<string>& arguments)
 		case 'c':clear = true;			break;
 		case 'f':new_folder = option.second;   break;
 		case 'p':predicat = option.second;   break;
+		case 'r':recursivly = false; break;
 		}
 	}
 	if (destination.empty())
@@ -78,5 +89,5 @@ void Copy::run(const vector<string>& arguments)
 
 
 
-	copy(destination, new_folder, predicat, clear);
+	copy(destination, new_folder, predicat, clear,recursivly);
 }

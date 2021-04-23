@@ -6,6 +6,7 @@ void Find::run(const vector<string>& arguments)
 
 	string top;
 	string predicat;
+	bool recursivly = false;
 
 	map<char, string> options = Common::parse_arguments(arguments,
 														keys,
@@ -19,27 +20,36 @@ void Find::run(const vector<string>& arguments)
 		{
 		case 't':top      = op.second; break;
 		case 'p':predicat = op.second; break;
+		case 'r':recursivly = true;    break;
 		}
 	}
 
 	if (top.empty()) kill_app("no top directory passed!");
 	if (predicat.empty()) kill_app("no predicat!");
 
-	find(top, predicat);
+	find(top, predicat,recursivly);
 }
-void Find::inner::find(const string& top, const string& predicat)
+void Find::inner::find(const string& top, const string& predicat, bool recursivly)
 {
 	namespace fs = std::filesystem;
 
 	fs::path top_dir = { top };
 	if (!fs::is_directory(top_dir)) kill_app(top + " must be directory!");
-	for (auto& p : fs::recursive_directory_iterator(top_dir))
+
+
+	auto process = [&](const string& p) 
 	{
-		string path = p.path().string();
-		if (does_match_with_predicat(predicat, path))
+		if (does_match_with_predicat(predicat, p))
 		{
-			cout << "found:" << p.path().u8string() << endl;
+			cout << "found:" << p << endl;
 		}
-	}
+	};
+
+	if (recursivly)
+		for (auto& p : fs::recursive_directory_iterator(top_dir))
+			process(p.path().string());
+	else
+		for (auto& p : fs::directory_iterator(top_dir))
+			process(p.path().string());
 
 }

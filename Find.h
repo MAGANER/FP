@@ -12,10 +12,11 @@ namespace Find
 		const string keys[KEYS_SIZE] = { "-t", "-p" };
 
 		const int SPEC_KEYS_SIZE = 1;
-		const string special_keys[SPEC_KEYS_SIZE] = {};
+		const string special_keys[SPEC_KEYS_SIZE] = {"-r"};
 
 		void find(const string& top,
-				  const string& predicat);
+				  const string& predicat,
+			      bool recursivly);
 
 		using namespace Common;
 	};
