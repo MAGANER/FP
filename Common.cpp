@@ -16,7 +16,7 @@ pair<char, string> Common::inner::parse_argument(const string& arg,
 
 	bool special_key = is_inside(arg, special_keys, spec_keys_size);
 	bool regular_key = is_inside(arg, keys, keys_size);
-	for (auto c : arg)cout << c << endl;
+	
 	if(arg.size() < 4 && !special_key)  Common::kill_app("argument is too short! >> "+arg);
 	if (regular_key && !special_key)
 		Common::kill_app("no such key:" + arg.substr(0, 2));
