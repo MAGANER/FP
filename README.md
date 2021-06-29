@@ -35,3 +35,6 @@ And so there is standart arguments, contained withing brackets<br>
 ```-f``` is folder, where should be stored copies<br>
 Also there is optional argument ```-c ```<br>
 Remove files from ```-w``` after they are copied to ```-f```<br>
+
+Common argument:<br>
+```-r``` process operation recursivly.
