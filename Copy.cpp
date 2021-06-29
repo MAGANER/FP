@@ -24,7 +24,7 @@ void Copy::inner::copy(const string& destination,
 		{
 			try
 			{
-				bool matched = does_match_with_predicat(predicat, f.path().string());
+				bool matched = does_match_with_predicat(predicat, f.path().filename().string());
 				bool can_be_copied = matched && f.is_regular_file();
 				if (can_be_copied)
 					copy(f, new_directory, filesystem::copy_options::overwrite_existing);

@@ -47,9 +47,9 @@ void Find::inner::find(const string& top, const string& predicat, bool recursivl
 
 	if (recursivly)
 		for (auto& p : fs::recursive_directory_iterator(top_dir))
-			process(p.path().string());
+			process(p.path().filename().string());
 	else
 		for (auto& p : fs::directory_iterator(top_dir))
-			process(p.path().string());
+			process(p.path().filename().string());
 
 }
